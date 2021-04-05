@@ -7,6 +7,8 @@ const Home = ({ content }) => {
   const [status, setStatus] = useState();
   const [submitted, setSubmitted] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState({});
+  const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [incorrectAnswers, setIncorrectAnswers] = useState(0);
 
   useEffect(() => {
     setQuestion({ questionId: 0, answers: getAnswers(0) });
@@ -32,13 +34,17 @@ const Home = ({ content }) => {
   const checkAnswer = (answer) => {
     setSubmitted(true);
     setSelectedAnswer(answer);
-    if (!status && answer.answerIndex === question.questionId) {
+    if (!status) {
+      if (answer.answerIndex === question.questionId) {
+        setCorrectAnswers(correctAnswers + 1);
+      } else {
+        setIncorrectAnswers(incorrectAnswers + 1);
+      }
       setStatus(true);
     }
   };
 
   const isCorrect = (answer, index, answers) => {
-    console.log(answers[index])
     if (submitted) {
       if (answer.answerIndex === question.questionId) {
         return "green";
@@ -64,7 +70,13 @@ const Home = ({ content }) => {
         <title>Word Shuffle</title>
         <link rel='icon' href='/favicon.ico' />
       </Head>
-
+      {question ? (
+        <div>
+          מס׳ שאלות : {question.questionId + 1} / {content.length}
+        </div>
+      ) : null}
+      <div>מספר תשובות נכונות : {correctAnswers}</div>
+      <div>מספר תשובות שגויות : {incorrectAnswers}</div>
       {question ? (
         <div className='question'>
           <h1>{content[question.questionId].Word}</h1>
@@ -85,7 +97,7 @@ const Home = ({ content }) => {
       ) : null}
 
       <div className='buttons'>
-        {status && question.questionId < content.length - 1 && (
+        {submitted && question.questionId < content.length - 1 && (
           <button onClick={nextQuestion}>הבא</button>
         )}
       </div>

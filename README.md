@@ -1,1 +1,1 @@
-A little application for english word quiz.
+A little web application for english word quiz.
