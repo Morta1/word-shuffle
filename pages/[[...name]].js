@@ -93,7 +93,7 @@ const Home = ({ content }) => {
         questionId: question.questionId + 1,
         answers: getAnswers(question.questionId + 1),
       });
-    }, 800);
+    }, 1100);
   };
 
   const tts = (text) => {
@@ -125,7 +125,7 @@ const Home = ({ content }) => {
             return null;
           }}
           ref={questionRef}
-          className={`question ${!submitted ? "fadein" : status ? "fadeout" : ""}`}
+          className={`question ${submitted && status && "animate"}`}
           action=''
           noValidate>
           <div className='header'>
@@ -196,12 +196,9 @@ const Container = styled.div`
     direction: rtl;
   }
 
-  .fadeout {
-    animation: fade 0.8s;
-  }
-  
-  .fadein {
-    animation: fade 0.8s reverse;
+  .animate {
+    animation: fadeout 0.8s;
+    animation-delay: 0.3s;
   }
 
   .answer {
@@ -232,7 +229,7 @@ const Container = styled.div`
     background-color: red;
   }
 
-  @keyframes fade {
+  @keyframes fadeout {
     0% {
       opacity: 1;
     }
