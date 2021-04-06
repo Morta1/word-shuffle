@@ -111,13 +111,15 @@ const Home = ({ content }) => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
       <NavBar />
-      {question ? (
-        <div>
-          מס׳ שאלות : {question.questionId + 1} / {content.length}
-        </div>
-      ) : null}
-      <div>מספר תשובות נכונות : {correctAnswers}</div>
-      <div>מספר תשובות שגויות : {incorrectAnswers}</div>
+      <div className='info'>
+        {question ? (
+          <div>
+            מס׳ שאלות : {question.questionId + 1} / {content.length}
+          </div>
+        ) : null}
+        <div>מספר תשובות נכונות : {correctAnswers}</div>
+        <div>מספר תשובות שגויות : {incorrectAnswers}</div>
+      </div>
       {question ? (
         <form
           onSubmit={(e) => {
@@ -174,8 +176,9 @@ const Home = ({ content }) => {
 export default Home;
 
 const Container = styled.div`
+  width: 400px;
+  margin: 0 auto;
   min-height: 100vh;
-  padding: 0 0.5rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -188,8 +191,17 @@ const Container = styled.div`
     margin-bottom: 0;
   }
 
+  .info {
+    direction: rtl;
+    align-self: flex-end;
+  }
+
   .tts {
     cursor: pointer;
+  }
+
+  .question {
+    margin-top: 15px;
   }
 
   .answers {
@@ -209,8 +221,8 @@ const Container = styled.div`
     cursor: pointer;
     background-color: transparent;
     border: 1px solid black;
-    width: 400px;
     height: 35px;
+    width: 400px;
   }
 
   .answer:disabled {

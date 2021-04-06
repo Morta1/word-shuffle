@@ -16,9 +16,11 @@ const NavBar = () => {
 
 const List = styled.ul`
   display: flex;
+  width: 100%;
+  justify-content: space-around;
   list-style-type: none;
+
   li {
-    margin-right: 10px;
     cursor: pointer;
     position: relative;
     display: block;
