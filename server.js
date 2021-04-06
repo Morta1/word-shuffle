@@ -14,10 +14,18 @@ app.prepare().then(() => {
     // Be sure to pass `true` as the second argument to `url.parse`.
     // This tells it to parse the query portion of the URL.
     const parsedUrl = parse(req.url, true);
-    const content = getCsvContent();
-    res.data = {
-      content,
-    };
+    console.log(parsedUrl.pathname)
+    if (
+      parsedUrl.pathname === "/" ||
+      parsedUrl.pathname === "/ofek" ||
+      parsedUrl.pathname === "/articles"
+    ) {
+      const sheetName = parsedUrl.pathname.substring(1);
+      const content = getCsvContent(sheetName);
+      res.data = {
+        content,
+      };
+    }
     handle(req, res, parsedUrl);
   }).listen(3000, (err) => {
     if (err) throw err;
