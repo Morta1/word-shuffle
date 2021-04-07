@@ -3,7 +3,6 @@ const { createServer } = require("http");
 const { parse } = require("url");
 const next = require("next");
 const { getCsvContent } = require("./be/utils");
-const { CLIENT_RENEG_WINDOW } = require("tls");
 
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
@@ -14,7 +13,6 @@ app.prepare().then(() => {
     // Be sure to pass `true` as the second argument to `url.parse`.
     // This tells it to parse the query portion of the URL.
     const parsedUrl = parse(req.url, true);
-    console.log(parsedUrl.pathname)
     if (
       parsedUrl.pathname === "/" ||
       parsedUrl.pathname === "/ofek" ||

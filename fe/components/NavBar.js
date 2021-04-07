@@ -7,7 +7,7 @@ const NavBar = () => {
     window.location.href = name;
   };
   return (
-    <List>  
+    <List>
       <li onClick={(e) => handleClick(e, "/ofek")}>Ofek</li>
       <li onClick={(e) => handleClick(e, "/articles")}>articles</li>
     </List>
@@ -25,10 +25,9 @@ const List = styled.ul`
     position: relative;
     display: block;
     padding: 4px 0;
-    font-family: Lato, sans-serif;
-    color: black;
+    color: white;
     text-decoration: none;
-    text-transform: uppercase;
+    text-transform: capitalize;
     transition: 0.5s;
 
     &::after {
@@ -38,14 +37,13 @@ const List = styled.ul`
       left: 0;
       width: 100%;
       height: 3px;
-      background: #3498db;
+      background: black;
       transform: scaleX(0);
       transform-origin: right;
       transition: transform 0.5s;
     }
 
     &:hover {
-      //color: #00000f;
     }
 
     &:hover::after {

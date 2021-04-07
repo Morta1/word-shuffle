@@ -5,9 +5,9 @@ const GlobalStyle = createGlobalStyle`
   body {
     padding: 0;
     margin: 0;
-    font-family: Lato, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-      Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
-      sans-serif;
+    font-family: 'M PLUS Rounded 1c', 'Rubik', sans-serif;
+    background-color: #5665d5;
+    min-height: 100vh;
   }
 
   * {

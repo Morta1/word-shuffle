@@ -1,10 +1,12 @@
 import Head from "next/head";
+import { useRouter } from "next/router";
 import NavBar from "../fe/components/NavBar";
 import { useState, useEffect, useRef } from "react";
 import { shuffle, getRandomArbitrary } from "../fe/utils";
-import styled, { createGlobalStyle } from "styled-components";
+import styled from "styled-components";
 
 const Home = ({ content }) => {
+  const router = useRouter();
   const [question, setQuestion] = useState();
   const [status, setStatus] = useState();
   const [submitted, setSubmitted] = useState(false);
@@ -31,8 +33,10 @@ const Home = ({ content }) => {
   }, [question]);
 
   const handleKeyDown = (e) => {
+    console.log(e.keyCode);
     switch (e.keyCode) {
       case 13:
+      case 32:
         nextRef?.current?.click();
         break;
       case 49:
@@ -108,10 +112,11 @@ const Home = ({ content }) => {
     <Container>
       <Head>
         <title>Word Shuffle</title>
-        <link rel='icon' href='/favicon.ico' />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
       <NavBar />
-      <div className='info'>
+      <h2 className="page-name">{router.query.name || "Ofek"}</h2>
+      <div className="info">
         {question ? (
           <div>
             מס׳ שאלות : {question.questionId + 1} / {content.length}
@@ -128,45 +133,47 @@ const Home = ({ content }) => {
           }}
           ref={questionRef}
           className={`question ${submitted && status && "animate"}`}
-          action=''
-          noValidate>
-          <div className='header'>
-            <h1 className='word'>{content[question.questionId].Word}</h1>
+          action=""
+          noValidate
+        >
+          <div className="header">
+            <h1 className="word">{content[question.questionId].Word}</h1>
             <img
               onClick={() => tts(content[question.questionId].Word)}
-              className='tts'
-              src='./volume.svg'
-              width='15'
-              height='15'
-              alt=''
+              className="tts"
+              src="./volume.svg"
+              width="15"
+              height="15"
+              alt=""
             />
             {content[question.questionId].Example ? (
               <div>{content[question.questionId].Example}</div>
             ) : null}
           </div>
-          <div className='answers' ref={answersRef}>
+          <div className="separator" />
+          <div className="answers" ref={answersRef}>
             {question.answers.map((answer, index, answers) => {
               return (
                 <button
                   disabled={submitted}
                   onClick={() => checkAnswer(answer)}
                   key={answer + " " + index}
-                  className={`answer ${isCorrect(answer, index, answers)}`}>
+                  className={`answer ${isCorrect(answer, index, answers)}`}
+                >
                   {index + 1}. {answer.Translation}
                 </button>
               );
             })}
           </div>
+          <div className={`buttons`}>
+            {submitted && !status && question.questionId < content.length - 1 && (
+              <button ref={nextRef} onClick={nextQuestion}>
+                הבא
+              </button>
+            )}
+          </div>
         </form>
       ) : null}
-
-      <div className='buttons'>
-        {submitted && !status && question.questionId < content.length - 1 && (
-          <button ref={nextRef} onClick={nextQuestion}>
-            הבא
-          </button>
-        )}
-      </div>
     </Container>
   ) : (
     <div>Error Page</div>
@@ -176,15 +183,25 @@ const Home = ({ content }) => {
 export default Home;
 
 const Container = styled.div`
-  width: 400px;
-  margin: 0 auto;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  color: #202225;
+
   .header {
-    margin-bottom: 10px;
+    //margin-bottom: 10px;
+  }
+
+  .page-name {
+    text-transform: capitalize;
+    color: white;
+  }
+
+  .separator {
+    margin: 10px 0;
+    height: 1px;
+    background-color: black;
   }
 
   .word {
@@ -192,8 +209,16 @@ const Container = styled.div`
   }
 
   .info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     direction: rtl;
-    align-self: flex-end;
+    margin: 10px 0;
+    padding: 25px;
+    border-radius: 10px;
+    width: 500px;
+    background-color: white;
   }
 
   .tts {
@@ -201,7 +226,10 @@ const Container = styled.div`
   }
 
   .question {
-    margin-top: 15px;
+    background-color: white;
+    padding: 25px;
+    border-radius: 10px;
+    width: 500px;
   }
 
   .answers {
@@ -214,31 +242,44 @@ const Container = styled.div`
   }
 
   .answer {
-    font-size: 16px;
+    font-family: "Rubik";
+    font-size: 17px;
     display: block;
     text-align: right;
     margin-bottom: 15px;
     cursor: pointer;
     background-color: transparent;
-    border: 1px solid black;
+    border: 1px solid transparent;
+    border-radius: 5px;
     height: 35px;
-    width: 400px;
+    color: #202225;
+    width: 450px;
   }
 
   .answer:disabled {
     color: black;
-    border: 1px solid black;
+    border: 1px solid transparent;
   }
 
   .buttons {
     height: 40px;
+
+    button {
+      font-size: 22px;
+      color: white;
+      background-color: #2f3136;
+      border: 0;
+      width: 200px;
+      height: 50px;
+      border-radius: 50px;
+    }
   }
 
   .green {
-    background-color: #88cc00;
+    background-color: #43b581;
   }
   .red {
-    background-color: red;
+    background-color: #d84445;
   }
 
   @keyframes fadeout {
