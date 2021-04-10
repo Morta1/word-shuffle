@@ -2,7 +2,7 @@
 const { createServer } = require("http");
 const { parse } = require("url");
 const next = require("next");
-const { getCsvContent } = require("./be/utils");
+const { getCsvContent, getSheetsNames } = require("./be/utils");
 
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
@@ -14,14 +14,13 @@ app.prepare().then(() => {
     // This tells it to parse the query portion of the URL.
     const parsedUrl = parse(req.url, true);
     if (
-      parsedUrl.pathname === "/" ||
-      parsedUrl.pathname === "/ofek" ||
-      parsedUrl.pathname === "/articles"
+      parsedUrl.pathname === "/"
     ) {
-      const sheetName = parsedUrl.pathname.substring(1);
-      const content = getCsvContent(sheetName);
+      const content = getCsvContent(parsedUrl.query.sheet || 0);
+      const sheetNames = getSheetsNames();
       res.data = {
         content,
+        sheetNames
       };
     }
     handle(req, res, parsedUrl);

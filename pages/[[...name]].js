@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { shuffle, getRandomArbitrary } from "../fe/utils";
 import styled from "styled-components";
 
-const Home = ({ content }) => {
+const Home = ({ content, sheetNames }) => {
   const router = useRouter();
   const [question, setQuestion] = useState();
   const [status, setStatus] = useState();
@@ -114,7 +114,7 @@ const Home = ({ content }) => {
         <title>Word Shuffle</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <NavBar />
+      <NavBar names={sheetNames} />
       <h2 className="page-name">{router.query.name || "Ofek"}</h2>
       <div className="info">
         {question ? (
@@ -296,5 +296,6 @@ Home.getInitialProps = (ctx) => {
   const { res } = ctx;
   return {
     content: res?.data?.content,
+    sheetNames: res?.data?.sheetNames,
   };
 };

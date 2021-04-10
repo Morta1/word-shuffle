@@ -1,15 +1,22 @@
 import React from "react";
 import styled from "styled-components";
 
-const NavBar = () => {
+const NavBar = ({ names }) => {
   const handleClick = (e, name) => {
     e.preventDefault();
     window.location.href = name;
   };
   return (
     <List>
-      <li onClick={(e) => handleClick(e, "/ofek")}>Ofek</li>
-      <li onClick={(e) => handleClick(e, "/articles")}>articles</li>
+      {names.map((name, index) => {
+        return (
+          <li
+            key={name + "-" + index}
+            onClick={(e) => handleClick(e, `/?sheet=${index}`)}>
+            {name}
+          </li>
+        );
+      })}
     </List>
   );
 };
