@@ -71,7 +71,6 @@ const Home = ({ content, sheetNames }) => {
       },
       { array: [rightAnswer], ids: [rightAnswer.answerIndex] }
     );
-    answers.ids.map((answerIndex) => console.log(answerIndex));
     return shuffle(answers.array);
   };
 
@@ -308,7 +307,7 @@ const Container = styled.div`
 Home.getInitialProps = (ctx) => {
   const { res } = ctx;
   return {
-    content: res?.data?.content.filter((_, index) => index < 15),
+    content: res?.data?.content,
     sheetNames: res?.data?.sheetNames,
   };
 };
