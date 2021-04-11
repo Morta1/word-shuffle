@@ -33,7 +33,6 @@ const Home = ({ content, sheetNames }) => {
   }, [question]);
 
   const handleKeyDown = (e) => {
-    console.log(e.keyCode);
     switch (e.keyCode) {
       case 13:
       case 32:
@@ -60,11 +59,20 @@ const Home = ({ content, sheetNames }) => {
 
   const getAnswers = (qId) => {
     const rightAnswer = { ...content[qId], answerIndex: qId };
-    const wrongAnswers = [1, 2, 3].map(() => {
-      const randomIndex = getRandomArbitrary(0, content.length, qId);
-      return { ...content[randomIndex], answerIndex: randomIndex };
-    });
-    return shuffle([rightAnswer, ...wrongAnswers]);
+    const answers = [1, 2, 3].reduce(
+      (res) => {
+        const randomIndex = getRandomArbitrary(0, content.length, res.ids);
+        res.array = [
+          ...res.array,
+          { ...content[randomIndex], answerIndex: randomIndex },
+        ];
+        res.ids = [...res.ids, randomIndex];
+        return res;
+      },
+      { array: [rightAnswer], ids: [rightAnswer.answerIndex] }
+    );
+    answers.ids.map((answerIndex) => console.log(answerIndex));
+    return shuffle(answers.array);
   };
 
   const checkAnswer = (answer) => {
@@ -91,13 +99,16 @@ const Home = ({ content, sheetNames }) => {
   };
 
   const nextQuestion = () => {
-    setStatus(true);
-    setTimeout(() => {
-      setQuestion({
-        questionId: question.questionId + 1,
-        answers: getAnswers(question.questionId + 1),
-      });
-    }, 1100);
+    const nextQuestionId = question.questionId + 1;
+    if (nextQuestionId < content.length) {
+      setStatus(true);
+      setTimeout(() => {
+        setQuestion({
+          questionId: nextQuestionId,
+          answers: getAnswers(nextQuestionId),
+        });
+      }, 1100);
+    }
   };
 
   const tts = (text) => {
@@ -115,7 +126,9 @@ const Home = ({ content, sheetNames }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <NavBar names={sheetNames} />
-      <h2 className="page-name">{router.query.name || "Ofek"}</h2>
+      <h2 className="page-name">
+        {sheetNames[router.query.sheet] || sheetNames[0]}{" "}
+      </h2>
       <div className="info">
         {question ? (
           <div>
@@ -295,7 +308,7 @@ const Container = styled.div`
 Home.getInitialProps = (ctx) => {
   const { res } = ctx;
   return {
-    content: res?.data?.content,
+    content: res?.data?.content.filter((_, index) => index < 15),
     sheetNames: res?.data?.sheetNames,
   };
 };
