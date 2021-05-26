@@ -12,7 +12,8 @@ const Home = ({ content, sheetNames }) => {
   const [submitted, setSubmitted] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState({});
   const [correctAnswers, setCorrectAnswers] = useState(0);
-  const [incorrectAnswers, setIncorrectAnswers] = useState(0);
+  const [incorrectAnswers, setIncorrectAnswers] = useState([]);
+  const [isFinished, setIsFinished] = useState(false);
   const nextRef = useRef();
   const questionRef = useRef();
   const answersRef = useRef();
@@ -81,7 +82,10 @@ const Home = ({ content, sheetNames }) => {
       setCorrectAnswers(correctAnswers + 1);
       nextQuestion();
     } else {
-      setIncorrectAnswers(incorrectAnswers + 1);
+      setIncorrectAnswers([
+        ...incorrectAnswers,
+        { ...content[question.questionId] },
+      ]);
       setStatus(false);
     }
   };
@@ -107,6 +111,8 @@ const Home = ({ content, sheetNames }) => {
           answers: getAnswers(nextQuestionId),
         });
       }, 1100);
+    } else {
+      setIsFinished(true);
     }
   };
 
@@ -135,56 +141,73 @@ const Home = ({ content, sheetNames }) => {
           </div>
         ) : null}
         <div>מספר תשובות נכונות : {correctAnswers}</div>
-        <div>מספר תשובות שגויות : {incorrectAnswers}</div>
+        <div>מספר תשובות שגויות : {incorrectAnswers.length || 0}</div>
       </div>
       {question ? (
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            return null;
-          }}
-          ref={questionRef}
-          className={`question ${submitted && status && "animate"}`}
-          action=""
-          noValidate
-        >
-          <div className="header">
-            <h1 className="word">{content[question.questionId].Word}</h1>
-            <img
-              onClick={() => tts(content[question.questionId].Word)}
-              className="tts"
-              src="./volume.svg"
-              width="15"
-              height="15"
-              alt=""
-            />
-            {content[question.questionId].Example ? (
-              <div>{content[question.questionId].Example}</div>
-            ) : null}
-          </div>
-          <div className="separator" />
-          <div className="answers" ref={answersRef}>
-            {question.answers.map((answer, index, answers) => {
-              return (
-                <button
-                  disabled={submitted}
-                  onClick={() => checkAnswer(answer)}
-                  key={answer + " " + index}
-                  className={`answer ${isCorrect(answer, index, answers)}`}
-                >
-                  {index + 1}. {answer.Translation}
-                </button>
-              );
-            })}
-          </div>
-          <div className={`buttons`}>
-            {submitted && !status && question.questionId < content.length - 1 && (
-              <button ref={nextRef} onClick={nextQuestion}>
-                הבא
-              </button>
-            )}
-          </div>
-        </form>
+        <>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              return null;
+            }}
+            ref={questionRef}
+            className={`question ${submitted && status && "animate"}`}
+            action=""
+            noValidate
+          >
+            <div className="header">
+              <h1 className="word">{content[question.questionId].Word}</h1>
+              <img
+                onClick={() => tts(content[question.questionId].Word)}
+                className="tts"
+                src="./volume.svg"
+                width="15"
+                height="15"
+                z
+                alt=""
+              />
+              {content[question.questionId].Example ? (
+                <div>{content[question.questionId].Example}</div>
+              ) : null}
+            </div>
+            <div className="separator" />
+            <div className="answers" ref={answersRef}>
+              {question.answers.map((answer, index, answers) => {
+                return (
+                  <button
+                    disabled={submitted}
+                    onClick={() => checkAnswer(answer)}
+                    key={answer + " " + index}
+                    className={`answer ${isCorrect(answer, index, answers)}`}
+                  >
+                    {index + 1}. {answer.Translation}
+                  </button>
+                );
+              })}
+            </div>
+            <div className={`buttons`}>
+              {submitted &&
+                !status &&
+                question.questionId < content.length - 1 && (
+                  <button ref={nextRef} onClick={nextQuestion}>
+                    הבא
+                  </button>
+                )}
+            </div>
+          </form>
+          {isFinished ? (
+            <div className="summary">
+              <h3>Incorrect Answers Summary</h3>
+              <div>
+                {incorrectAnswers.map((question, index) => (
+                  <div key={question.word + "" + index}>
+                    {question.Word} - {question.Translation}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+        </>
       ) : null}
     </Container>
   ) : (
@@ -202,7 +225,6 @@ const Container = styled.div`
   color: #202225;
 
   .header {
-    //margin-bottom: 10px;
   }
 
   .page-name {
@@ -237,11 +259,16 @@ const Container = styled.div`
     cursor: pointer;
   }
 
-  .question {
+  .question,
+  .summary {
     background-color: white;
     padding: 25px;
     border-radius: 10px;
     width: 500px;
+  }
+
+  .summary {
+    margin-top: 10px;
   }
 
   .answers {
@@ -307,7 +334,13 @@ const Container = styled.div`
 Home.getInitialProps = (ctx) => {
   const { res } = ctx;
   return {
-    content: res?.data?.content,
+    content: [
+      res?.data?.content[0],
+      res?.data?.content[1],
+      res?.data?.content[3],
+      res?.data?.content[4],
+      res?.data?.content[5],
+    ],
     sheetNames: res?.data?.sheetNames,
   };
 };
