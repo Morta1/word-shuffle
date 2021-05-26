@@ -334,13 +334,7 @@ const Container = styled.div`
 Home.getInitialProps = (ctx) => {
   const { res } = ctx;
   return {
-    content: [
-      res?.data?.content[0],
-      res?.data?.content[1],
-      res?.data?.content[3],
-      res?.data?.content[4],
-      res?.data?.content[5],
-    ],
+    content: res?.data?.content,
     sheetNames: res?.data?.sheetNames,
   };
 };
