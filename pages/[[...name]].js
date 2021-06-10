@@ -21,6 +21,7 @@ const Home = ({ content, sheetNames }) => {
   useEffect(() => {
     if (content) {
       setQuestion({ questionId: 0, answers: getAnswers(0) });
+      tts(content[0].Word);
     }
     document.addEventListener("keydown", handleKeyDown);
     return () => {
@@ -110,6 +111,7 @@ const Home = ({ content, sheetNames }) => {
           questionId: nextQuestionId,
           answers: getAnswers(nextQuestionId),
         });
+        tts(content[nextQuestionId].Word)
       }, 1100);
     } else {
       setIsFinished(true);
