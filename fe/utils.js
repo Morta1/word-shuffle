@@ -22,8 +22,10 @@ const shuffle = (array) => {
 
 const getRandomArbitrary = (min, max, excluded) => {
   let randomNumber = Math.floor(Math.random() * (max - min) + min);
-  while (excluded.indexOf(randomNumber) !== -1) {
+  let iterations = 0;
+  while (excluded.indexOf(randomNumber) !== -1 && iterations > 30) {
     randomNumber = Math.floor(Math.random() * (max - min) + min);
+    iterations++;
   }
   return randomNumber;
 };

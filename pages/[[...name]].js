@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { shuffle, getRandomArbitrary } from "../fe/utils";
 import styled from "styled-components";
 
-const Home = ({ content, sheetNames }) => {
+const Home = ({ allContent, sheetNames }) => {
   const router = useRouter();
   const [question, setQuestion] = useState();
   const [status, setStatus] = useState();
@@ -14,14 +14,14 @@ const Home = ({ content, sheetNames }) => {
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [incorrectAnswers, setIncorrectAnswers] = useState([]);
   const [isFinished, setIsFinished] = useState(false);
+  const [content, setContent] = useState([]);
   const nextRef = useRef();
   const questionRef = useRef();
   const answersRef = useRef();
 
   useEffect(() => {
-    if (content) {
-      setQuestion({ questionId: 0, answers: getAnswers(0) });
-      tts(content[0].Word);
+    if (allContent) {
+      setContent(filterOutKnownQuestions(allContent));
     }
     document.addEventListener("keydown", handleKeyDown);
     return () => {
@@ -33,6 +33,22 @@ const Home = ({ content, sheetNames }) => {
     setSubmitted(false);
     setStatus(false);
   }, [question]);
+
+  useEffect(() => {
+    if (content.length > 0) {
+      setQuestion({ questionId: 0, answers: getAnswers(0) });
+      tts(content?.[0]?.Word);
+    }
+  }, [content]);
+
+  const filterOutKnownQuestions = (data) => {
+    return data.filter((item) => {
+      const word = item.Word.trim();
+      const sheetName = sheetNames[router.query.sheet] || sheetNames[0];
+      const sheetData = JSON.parse(localStorage.getItem(sheetName)) || {};
+      return sheetData[word] ? sheetData[word] < 5 : true;
+    });
+  };
 
   const handleKeyDown = (e) => {
     switch (e.keyCode) {
@@ -79,7 +95,18 @@ const Home = ({ content, sheetNames }) => {
   const checkAnswer = (answer) => {
     setSubmitted(true);
     setSelectedAnswer(answer);
+    const sheetName = sheetNames[router.query.sheet] || sheetNames[0];
+    const sheetData = JSON.parse(localStorage.getItem(sheetName)) || {};
+    const questionWord = content[question.questionId].Word.trim();
+    let numberOfTime = sheetData[questionWord] || 0;
     if (answer.answerIndex === question.questionId) {
+      localStorage.setItem(
+        sheetName,
+        JSON.stringify({
+          ...sheetData,
+          [questionWord]: ++numberOfTime,
+        })
+      );
       setCorrectAnswers(correctAnswers + 1);
       nextQuestion();
     } else {
@@ -111,7 +138,7 @@ const Home = ({ content, sheetNames }) => {
           questionId: nextQuestionId,
           answers: getAnswers(nextQuestionId),
         });
-        tts(content[nextQuestionId].Word)
+        tts(content[nextQuestionId].Word);
       }, 1100);
     } else {
       setIsFinished(true);
@@ -126,7 +153,7 @@ const Home = ({ content, sheetNames }) => {
     window.speechSynthesis.speak(msg);
   };
 
-  return content ? (
+  return content.length > 0 ? (
     <Container>
       <Head>
         <title>Word Shuffle</title>
@@ -336,7 +363,7 @@ const Container = styled.div`
 Home.getInitialProps = (ctx) => {
   const { res } = ctx;
   return {
-    content: res?.data?.content,
+    allContent: res?.data?.content,
     sheetNames: res?.data?.sheetNames,
   };
 };
